@@ -3,17 +3,15 @@ package br.com.sistema.api.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+
+import br.com.sistema.api.model.paciente.DadosAtualizacaoPaciente;
 import br.com.sistema.api.model.paciente.DadosCadastroPaciente;
 import br.com.sistema.api.model.paciente.Paciente;
 import br.com.sistema.api.model.paciente.PacienteRepository;
 import jakarta.transaction.Transactional;
 
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 
 @RestController
@@ -34,14 +32,31 @@ public class PacienteController {
 
 
     // GET Request -> Response -> Ex: Tela Home
-    @GetMapping("/") // Aponta para localhost:8080/paciente
+    @GetMapping("/listar-todos") // Aponta para localhost:8080/paciente
     public List<Paciente> listarPacientes(){
         return pacienteRepository.findAll();
     };
 
+     @DeleteMapping("/deletar/{id}")
+    @Transactional 
+    public void excluir(@PathVariable Integer id){
+        pacienteRepository.deleteById(id);
+    } 
+
+    @DeleteMapping("/alterar-status/{id}")
+    @Transactional 
+    public void alterarStatus(@PathVariable Integer id){
+        var paciente = pacienteRepository.getReferenceById(id);
+        paciente.excluirLogico();
+    }
+
+    @PutMapping("/atualizar")
+    @Transactional 
+    public void atualizar(@RequestBody DadosAtualizacaoPaciente dados){
+        var paciente = pacienteRepository.getReferenceById(dados.id());
+        paciente.atualizarInformacoes(dados);
+    }
 
 
-    // GET/POST Request -> Response -> Ex: Cadastrar Paciente. GET exibe tela de cadastro e POST é chamado quando o botão enviar é clicado. 
-    // GET/PUT Request -> Response -> Ex: Alterar telefone. GET exibe a tela de alteração, PUT é chamado quando o botão alterar é clicado. 
-    // DELETE
+
 }
